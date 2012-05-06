@@ -1,7 +1,15 @@
 Persisting Relations in a Polyglot World
 ========================================
 
-_\[…a half-sentence of introduction/talk link?…\]_
+Hi, my name is Piotr Szotkowski and I was invited by Greg to write a
+_Practicing Ruby_ article after he saw my RubyConf 2011 talk _Persisting
+Relations Across Time and Space_
+([slides](http://persistence-rubyconf-2011.heroku.com),
+[video](http://confreaks.net/videos/657)). This is not a one-to-one text
+version of that talk; rather, these are some thoughts on the topics of
+[polyglot
+persistence](http://architects.dzone.com/articles/polyglot-persistence-future)
+and modelling relations between objects.
 
 Persistence: Your Objects’ Time Travel
 --------------------------------------
