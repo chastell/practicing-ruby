@@ -158,14 +158,58 @@ consists of 4,000 entries and works fast enough.
 Sweet Relations, How Do They Work?
 ----------------------------------
 
-_\[…relations between objects are often the crux of our application and the
-problem of their persistence is usually overlooked…\]_
+Now that we’ve covered the idea of object persistence using various backends
+it’s time to finally talk about relations between objects. Quite often it’s the
+relations that are the crux of our application (even when we’re not building
+another social network…), and the problem of their persistence is usually
+overlooked and simplified to ‘let’s just use foreign keys and join tables where
+needed’.
 
-_\[…the way relations are ‘canonically’ persisted depends greatly on the type
-of the database backend: keys, embedding, graph edges…\]_
+The way relations are canonically persisted depends greatly on the type of the
+database. Contrary to their name, relational databases are not an ideal
+solution for storing relations: their name comes from relations between the
+rows of a single table (which translates to the assumption that objects of the
+same class have the same property types), not from relations between objects of
+potentially different classes, which end up being rows in separate tables.
 
-_\[…modelling relations as proper domain objects can yield surprising results,
-and their persistence can be greatly simplified…\]_
+Modelling relations in relational databases is quite complicated and depends on
+the type of relation, its directionality and whether it carries any
+relation-specific data. For example, an object representing a person can have
+the relations such as having a particular gender (one-to-many relation), having
+a hobby (many-to-many), having a spouse (many-to-many, with the relation
+carrying additional data, such as start date of the relationship),
+participating in an event (many-to-many, with additional data such as
+participation role), being on two different ends of parental relation (having
+parents and children), etc. Some of these relations (gender) can be stored
+right in the `people` table, some need to be represented by having a foreign
+key, other require a separate join table (potentially carrying any
+relation-specific data). Dereferencing such relations mean crafring and
+executing (potentially complicated) SQL `JOIN` queries.
+
+Modelling relations in document databases is quite different. Some of the
+relations (like the above-mentioned post/comments example) are best modelled
+using embedded documents; while very useful in certain scenarios (retrieving
+post with all of its comments), this approach might cause problems when new
+features require cross-cutting through all of such embedded documents –
+retrieving all of the comments by a given person or the list of the most recent
+comments means scanning through the whole `posts` collection.
+
+While some document databases employ implicit, foreign-key-like references
+(like MongoDB’s DBRefs, which are two-key documents of the form `{ $ref:
+<collection>, $id: <object_id> }`), dereferencing relations is usually a bigger
+problem (due to the lack of standard approaches like SQL `JOIN` queries) and is
+often done on the client side (even if it’s simplified greatly by tools like
+[MongoHydrator](https://github.com/gregspurrier/mongo_hydrator)).
+
+Key-value stores are, by definition, the least relation friendly backends – any
+modelling requires explicit foreign keys that need to be managed client-side.
+On the other end of the spectrum are graph databases: relations (modelled as
+edges) can usually carry any data required, can as easily point in either or
+both directions and are represented in the same way regardless of whether they
+model a one-to-one, one-to-many or many-to-many relation. Graph databases also
+allow for all kinds of data analysis/querying based on the relations themselves
+– things like graph traversal or proximity metrics are much easier done (and
+much faster) than in relationship databases.
 
 Object Databases
 ----------------
