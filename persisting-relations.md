@@ -211,6 +211,51 @@ allow for all kinds of data analysis/querying based on the relations themselves
 – things like graph traversal or proximity metrics are much easier done (and
 much faster) than in relationship databases.
 
+Modelling Relations as Proper Objects
+-------------------------------------
+
+Now that we know the different ways (and issues with) persisting objects and
+relations between them – is there a way to model relations that could be deemed
+‘persistence independent’, or at least ‘not persistence driven’? One of such
+approaches would be to model relations as proper objects in the system, akin to
+how they’re modelled in graph databases.
+
+With this approach relations would be objects that reference two other objects
+and carry any additional data particular to a given relation (such as
+participation role in a relation between a person and an event, start/end dates
+of the given relation, etc.). This approach is the most flexible in schema-less
+databases – document databases could have a separate collection of relations,
+and different relations could store different types of data. In relational
+databases this could be modelled either by separate tables (one per relation
+type) or a common `relations` table storing the references to the related
+objects and a relation type pointing to a table holding data for all relations
+of this particular type/schema.
+
+The main drawback of this approach is dereferencing – getting other objects
+related to a given object at hand would be a two-step process: getting all of
+the object’s relations (potentially only of a certain type) and then getting
+all of the ‘other’ objects referenced by these relations. Note, however, that
+this is exactly what we do every day with join tables for many-to-many
+relations – so the drawback is mostly that this approach would apply to all of
+the relations in the given system, not only many-to-many ones.
+
+The main advantages of this approach are its simplicity (everything is an
+object, relations just happen to share certain properties, like the object
+identifiers they reference) and potential higher portability (by not driving,
+nor tying the way relations are modelled to the given persistence approach).
+Having relations as proper objects can also help in producing aggregated
+statistics about the system (like ‘what are the hubs of the system – the most
+connected objects, regardless of relation type’).
+
+Additionally, when all of the objects in the system have unique identifiers
+([of course PostgreSQL have a native type for
+UUIDs…](http://www.postgresql.org/docs/9.1/static/datatype-uuid.html)),
+relations no longer need to carry the information about the table/collection of
+the referenced object; assuming the system has a way to retrieve an object
+solely based on its UUID, relations become – in their simplest form – just
+triples of 128-bit UUIDs (one identifying the relation and the other two the
+referenced objects).
+
 Object Databases
 ----------------
 
