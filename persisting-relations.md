@@ -11,6 +11,8 @@ version of that talk; rather, these are some thoughts on the topics of
 persistence](http://architects.dzone.com/articles/polyglot-persistence-future)
 and modelling relations between objects.
 
+
+
 Persistence: Your Objects’ Time Travel
 --------------------------------------
 
@@ -39,6 +41,8 @@ model relations (`belongs_to`, `has_many`, `has_and_belongs_to_many`, etc.)
 sometimes furthers the problem by giving us seemingly fit-all solutions which
 are often quite useful, but end up requiring just-this-little-bit-more tweaking
 – tweaking which accumulates over time.
+
+
 
 Persistence in Practice
 -----------------------
@@ -155,6 +159,8 @@ there in the YAML file. Is it scalable? Probably not really, but [my current
 database of email signatures](https://github.com/chastell/dotfiles/blob/aee1d31618e2e4ea88186eda163f29ebd72702d1/.local/share/signore/signatures.yml)
 consists of 4,000 entries and works fast enough.
 
+
+
 Sweet Relations, How Do They Work?
 ----------------------------------
 
@@ -211,6 +217,8 @@ allow for all kinds of data analysis/querying based on the relations themselves
 – things like graph traversal or proximity metrics are much easier done (and
 much faster) than in relationship databases.
 
+
+
 Modelling Relations as Proper Objects
 -------------------------------------
 
@@ -256,16 +264,22 @@ solely based on its UUID, relations become – in their simplest form – just
 triples of 128-bit UUIDs (one identifying the relation and the other two the
 referenced objects).
 
+
+
 Object Databases
 ----------------
 
 _\[…possibly solving all of this, but still somewhat in the future…\]_
+
+
 
 Not Your Usual Persistence
 --------------------------
 
 _\[…Candy/Ambition example of transparent persistence and Ruby-like
 querying…\]_
+
+
 
 ← Models | Persistence →
 ------------------------
