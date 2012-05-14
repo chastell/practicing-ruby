@@ -269,7 +269,22 @@ referenced objects).
 Object Databases
 ----------------
 
-_\[…possibly solving all of this, but still somewhat in the future…\]_
+Quite a different approach to solving problems with persisiting relations
+between objects is not to persist the objects in any way that requires explicit
+mapping, but by using an object database instead.
+
+In the past, there were a few approaches to solving this problem in Ruby –
+notable contestants being [Madeleine](http://madeleine.rubyforge.org),
+[ODB](http://zeropluszero.com/software/odb/) and
+[HybridDB](https://github.com/pauliephonic/hybriddb); unfortunately, all of
+them seem to be no longer maintained (although some birds at the wroc_love.rb
+conference earlier this year suggested it might get revived if enough interest
+is expressed…). Currently the most promising solution for straight object
+persistence is [MagLev](http://maglev.github.com) – a recently released Ruby
+implementation built on top of the GemStone/S Virtual Machine known as _the_
+Smalltalk object persistence solution. While I have hight hopes for MagLev, it
+probably won’t be a widely-adopted silver bullet for some time, so the problem
+of relation persistence (especially for existing codebases) is not yet solved.
 
 
 
