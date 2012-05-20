@@ -220,27 +220,27 @@ _An example set of relations (arrows) between ‘typical’ objects in a system.
 Modelling relations in document databases is quite different. Some of the
 relations (like the above-mentioned post/comments example) are best modelled
 using embedded documents; while very useful in certain scenarios (retrieving
-post with all of its comments), this approach might cause problems when new
-features require cross-cutting through all of such embedded documents –
-retrieving all of the comments by a given person or the list of the most recent
-comments means scanning through the whole `posts` collection.
+a post with all of its comments), this approach might cause problems when new
+features require cross-cutting through all of such embedded documents
+– retrieving all of the comments by a given person, or getting the list of the
+most recent comments, means scanning through the whole `posts` collection.
 
 While some document databases employ implicit, foreign-key-like references
-(like MongoDB’s DBRefs, which are two-key documents of the form `{ $ref:
+(e.g. MongoDB’s DBRefs, which are two-key documents of the form `{ $ref:
 <collection>, $id: <object_id> }`), dereferencing relations is usually a bigger
 problem (due to the lack of standard approaches like SQL `JOIN` queries) and is
-often done on the client side (even if it’s simplified greatly by tools like
-[MongoHydrator](https://github.com/gregspurrier/mongo_hydrator)).
+often done on the client side, even if it’s greatly simplified by tools like
+[MongoHydrator](https://github.com/gregspurrier/mongo_hydrator).
 
-Key-value stores are, by definition, the least relation friendly backends – any
-modelling requires explicit foreign keys that need to be managed client-side.
-On the other end of the spectrum are graph databases: relations (modelled as
-edges) can usually carry any data required, can as easily point in either or
-both directions and are represented in the same way regardless of whether they
-model a one-to-one, one-to-many or many-to-many relation. Graph databases also
-allow for all kinds of data analysis/querying based on the relations themselves
-– things like graph traversal or proximity metrics are much easier done (and
-much faster) than in relationship databases.
+Key-value stores are, by definition, the least relation-friendly backends – and
+using them for modelling relations requires explicit foreign keys that need to
+be managed client-side. On the other end of the spectrum are graph databases:
+relations (modelled as edges) can usually carry any data required, can as
+easily point in either or both directions and are represented in the same way
+regardless of whether they model a one-to-one, one-to-many or many-to-many
+relation. Graph databases also allow for all kinds of data analysis/querying
+based on the relations themselves – things like graph traversal or proximity
+metrics are much easier done (and much faster) than in relational databases.
 
 
 
@@ -265,7 +265,7 @@ objects and a relation type pointing to a table holding data for all relations
 of this particular type/schema.
 
 The main drawback of this approach is dereferencing – getting other objects
-related to a given object at hand would be a two-step process: getting all of
+related to the object at hand would be a two-step process: getting all of
 the object’s relations (potentially only of a certain type) and then getting
 all of the ‘other’ objects referenced by these relations. Note, however, that
 this is exactly what we do every day with join tables for many-to-many
@@ -273,21 +273,21 @@ relations – so the drawback is mostly that this approach would apply to all of
 the relations in the given system, not only many-to-many ones.
 
 The main advantages of this approach are its simplicity (everything is an
-object, relations just happen to share certain properties, like the object
-identifiers they reference) and potential higher portability (by not driving,
-nor tying the way relations are modelled to the given persistence approach).
-Having relations as proper objects can also help in producing aggregated
-statistics about the system (like ‘what are the hubs of the system – the most
-connected objects, regardless of relation type’).
+object; relations just happen to carry certain properties, like the identifiers
+of the objects they reference) and potential higher portability (by not tying
+the way relations are modelled to a given persistence approach). Having
+relations as proper objects can also help in producing aggregated statistics
+about the system (like ‘what are the hubs of the system – the most connected
+objects, regardless of relation type’).
 
 Additionally, when all of the objects in the system have unique identifiers
-([of course PostgreSQL have a native type for
+([_of course_ PostgreSQL has a native type for
 UUIDs…](http://www.postgresql.org/docs/9.1/static/datatype-uuid.html)),
 relations no longer need to carry the information about the table/collection of
 the referenced object; assuming the system has a way to retrieve an object
 solely based on its UUID, relations become – in their simplest form – just
 triples of 128-bit UUIDs (one identifying the relation and the other two the
-referenced objects).
+referenced objects) plus some information about the relation type.
 
 
 
@@ -311,9 +311,10 @@ conference earlier this year suggested it might get revived if enough interest
 is expressed…). Currently the most promising solution for straight object
 persistence is [MagLev](http://maglev.github.com) – a recently released Ruby
 implementation built on top of the GemStone/S Virtual Machine known as _the_
-Smalltalk object persistence solution. While I have hight hopes for MagLev, it
-probably won’t be a widely-adopted silver bullet for some time, so the problem
-of relation persistence (especially for existing codebases) is not yet solved.
+Smalltalk object persistence solution. While it probably won’t be
+a widely-adopted silver bullet for some time, I have hight hopes for MagLev and
+the changes object persistence can bring to the way we think about giving our
+objects immortality.
 
 
 
@@ -349,7 +350,7 @@ rubyconf.events.parties.thursday    #=> '&block Party'
 
 For a similarly unobtrusive way to _query_ a collection,
 [Ambition](http://defunkt.io/ambition/) – unfortunately, also currently
-unmaintained, although I heard the DataMapper adapter is getting some love –
+unmaintained, although I heard its DataMapper adapter is getting some love –
 provides a way to do Ruby-like queries against any supported persistence store.
 
 Compare an example query against an ActiveRecord-supported store:
@@ -407,7 +408,7 @@ teaches us that our domain models should be tied one-to-one to their database
 representations, there are other (potentially: better) ways to do persistence
 in object oriented world – and if this topic sounds intriguing, you might be
 interested in another of my talks, given at wroc\_love.rb this year (with a
-highly revised version scheduled for Scottish Ruby Conference in Edinburgh):
+highly revised version scheduled for the Scottish Ruby Conference in Edinburgh):
 _Decoupling Persistence (Like There’s Some Tomorrow)_
 ([slides](http://decoupling-wrocloverb-2012.heroku.com),
 [video](https://www.youtube.com/watch?v=w7Eol9N3jGI)).
