@@ -213,6 +213,10 @@ key, other require a separate join table (potentially carrying any
 relation-specific data). Dereferencing such relations means crafting and
 executing (potentially complicated) SQL `JOIN` queries.
 
+![relations](https://github.com/chastell/practicing-ruby/raw/master/relations.png)
+
+_An example set of relations (arrows) between ‘typical’ objects in a system._
+
 Modelling relations in document databases is quite different. Some of the
 relations (like the above-mentioned post/comments example) are best modelled
 using embedded documents; while very useful in certain scenarios (retrieving
