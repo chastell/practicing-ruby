@@ -16,6 +16,11 @@ and modelling relations between objects.
 Persistence: Your Objects’ Time Travel
 --------------------------------------
 
+> If the first thing you type, when writing a Ruby app, is `rails`, you’ve
+> already lost the architecture game.
+>
+> <cite>Uncle Bob Martin</cite>
+
 The first thing we need to ask ourselves when thinking about object persistence
 is how can we dehydrate an object into a set of simple values – usually
 strings, numbers, dates and boolean ‘flags’ – in a way that will let us
@@ -47,6 +52,12 @@ are often quite useful, but end up requiring just-this-little-bit-more tweaking
 Persistence in Practice
 -----------------------
 
+> A database is a black hole into which you put your data. If you’re lucky,
+> you’ll get it back again. If you’re very lucky, you’ll get it back in a form
+> you can use.
+>
+> <cite>Charlie Gibbs</cite>
+
 As mentioned above, persisiting an object means dehydrating it into a set of
 simple values – but they way we do this depends heavily on the database backend
 being used.
@@ -66,10 +77,15 @@ booleans are usually fair game, and the ORM can take care of exposing them as
 leveraging a given RDBMS’s features? For example, PostgreSQL not only exposes
 ‘real’ booleans, but [a lot of other very useful
 types](http://www.postgresql.org/docs/9.1/static/datatype.html) – such as
-gemometric points and paths, network addresses, XML (with XPath query support
-to search and filter by!) or arrays (so we can actually store a given blog
-post’s tags in a single column in the `posts` table and query by
-inclusion/exclusion just as well as with a separate join table).
+geometric points and paths, network addresses, XML (with XPath query support to
+search and filter by!) or arrays (so we can actually store a given blog post’s
+tags in a single column in the `posts` table and query by inclusion/exclusion
+just as well as with a separate join table).
+
+> Database research has produced a number of good results, but the relational
+> database is not one of them.
+>
+> <cite>Henry G. Baker</cite>
 
 Persisting objects in document databases (such as CouchDB or MongoDB) is
 somewhat similar, but often quite a bit different; classes are usually mapped
@@ -156,8 +172,13 @@ db:
 This allows us to have an automated way to persist and rehydrate our `Quote`
 objects while also allowing us to easily edit them and fix any typos right
 there in the YAML file. Is it scalable? Probably not really, but [my current
-database of email signatures](https://github.com/chastell/dotfiles/blob/aee1d31618e2e4ea88186eda163f29ebd72702d1/.local/share/signore/signatures.yml)
+database of email
+signatures](https://github.com/chastell/dotfiles/blob/aee1d31618e2e4ea88186eda163f29ebd72702d1/.local/share/signore/signatures.yml)
 consists of 4,000 entries and works fast enough.
+
+(And – if you’re eager to try YAML as a storage backend – [YAML
+Record](https://github.com/nico-taing/yaml_record) and [YAML
+Model](http://www.darkarts.co.za/yaml-model) might be worth checking out.)
 
 
 
@@ -185,11 +206,11 @@ the relations such as having a particular gender (one-to-many relation), having
 a hobby (many-to-many), having a spouse (many-to-many, with the relation
 carrying additional data, such as start date of the relationship),
 participating in an event (many-to-many, with additional data such as
-participation role), being on two different ends of parental relation (having
+participation role), being on two different ends of a parental relation (having
 parents and children), etc. Some of these relations (gender) can be stored
 right in the `people` table, some need to be represented by having a foreign
 key, other require a separate join table (potentially carrying any
-relation-specific data). Dereferencing such relations mean crafring and
+relation-specific data). Dereferencing such relations means crafting and
 executing (potentially complicated) SQL `JOIN` queries.
 
 Modelling relations in document databases is quite different. Some of the
@@ -268,6 +289,10 @@ referenced objects).
 
 Object Databases
 ----------------
+
+> Now that people are considering NoSQL will more people consider no-database?
+>
+> <cite>Martin Fowler</cite>
 
 Quite a different approach to solving problems with persisiting relations
 between objects is not to persist the objects in any way that requires explicit
