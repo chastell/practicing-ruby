@@ -131,13 +131,13 @@ store = YAML::Store.new 'quotes.yml'
 # quotes are author + text structures
 Quote = Struct.new :author, :text
 
-store.transaction do   # a read/write transaction…
+store.transaction do   # a read/write transaction...
   store['db'] ||= []
   store['db'] << Quote.new('Charlie Gibbs',
     'A database is a black hole into which you put your data.')
   store['db'] << Quote.new('Will Jessop',
     'MySQL is truly the PHP of the database world.')
-end                    # …is atomically committed here
+end                    # ...is atomically committed here
 
 # read-only transactions can be concurrent
 # and raise when you try to write anything
