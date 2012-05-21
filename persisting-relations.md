@@ -1,23 +1,16 @@
-Persisting Relations in a Polyglot World
-========================================
-
-Hi, my name is Piotr Szotkowski and I was invited by Greg to write a
-_Practicing Ruby_ article after he saw my RubyConf 2011 talk _Persisting
+*This article is written by Piotr Szotkowski. Greg invited Piotr to contribute
+to Practicing Ruby after seeing his RubyConf 2011 talk _Persisting
 Relations Across Time and Space_
 ([slides](http://persistence-rubyconf-2011.heroku.com),
 [video](http://confreaks.net/videos/657)). This is not a one-to-one text
-version of that talk; rather, these are some thoughts on the topics of
-[polyglot
-persistence](http://architects.dzone.com/articles/polyglot-persistence-future)
-and modelling relations between objects.
+version of that talk; Piotr has instead chosen to share some thoughts on the topics of
+[polyglot persistence](http://architects.dzone.com/articles/polyglot-persistence-future)
+and modeling relations between objects.*
 
-
-
-Persistence: Your Objects’ Time Travel
---------------------------------------
+### Persistence: Your Objects’ Time Travel
 
 > If the first thing you type, when writing a Ruby app, is `rails`, you’ve
-> already lost the architecture game.
+> already [lost the architecture game](http://confreaks.com/videos/759).
 >
 > <cite>Uncle Bob Martin</cite>
 
@@ -26,31 +19,30 @@ is how can we dehydrate an object into a set of simple values – usually
 strings, numbers, dates and boolean ‘flags’ – in a way that will let us
 rehydrate it back at some point in the future, often on a completely unrelated
 run of our application. With the bulk of contemporary Ruby programs being Rails
-webapps this is so obvious we usually don’t even think about it; the
-persistence is conviniently taken care of by ActiveRecord and we often actually
+web apps, this is so obvious we usually don’t even think about it; the
+persistence is conveniently taken care of by ActiveRecord and we often actually
 _start_ writing the application by defining database-oriented models of our
-objects: `rails generate model person name bio:text height:float born:date
-vip:boolean`, followed by `rake db:migrate`, takes care of any
-behind-the-scenes machinery required to persist instances of our `Person`
-class.
+objects: 
 
-The main problem with the above (other than the fact that starting designing
-your app by writing `rails` is [considered _losing the architecture game_ by
-some](http://confreaks.com/videos/759)) is that it puts us into a tight tunnel
-of relational database-driven design – and while many came back saying that the
+```bash
+$ rails generate model person name bio:text height:float born:date vip:boolean
+$ rake db:migrate
+```
+
+This simple two-line command sequence takes care of all the behind-the-scenes 
+machinery required to persist instances of our `Person` class. The main 
+problem with the above is that it puts us into a tight tunnel
+of relational database-driven design. While many came back saying that the
 light at the end is one of a truly glorious meadow and we should speed up to
 get there faster, our actual options of taking detours, driving on the
-shoulders and stopping for a bit to take a high-altitute view of the road ahead
+shoulders and stopping for a bit to take a high-altitude view of the road ahead
 are even more limited than the run of this metaphor. ActiveRecord’s handling of
-model relations (`belongs_to`, `has_many`, `has_and_belongs_to_many`, etc.)
+model relations (`belongs_to`, `has_many`, etc.)
 sometimes furthers the problem by giving us seemingly fit-all solutions which
-are often quite useful, but end up requiring just-this-little-bit-more tweaking
-– tweaking which accumulates over time.
+are often quite useful, but end up requiring just-this-little-bit-more tweaking;
+tweaking which accumulates over time.
 
-
-
-Persistence in Practice
------------------------
+### Persistence in Practice
 
 > A database is a black hole into which you put your data. If you’re lucky,
 > you’ll get it back again. If you’re very lucky, you’ll get it back in a form
@@ -59,13 +51,13 @@ Persistence in Practice
 > <cite>Charlie Gibbs</cite>
 
 As mentioned above, persisiting an object means dehydrating it into a set of
-simple values – but they way we do this depends heavily on the database backend
+simple values. The way we do this depends heavily on the database backend
 being used.
 
 When it comes to the most popular case of relational databases (such as MySQL,
-PostgreSQL or SQLite), we use tables for classes, rows for objects and columns
+PostgreSQL or SQLite), we use tables for classes, rows for objects, and columns
 to hold a given object property across all instances of the same class. To
-persiste an object, we serialise the given object’s properties down into table
+persist an object, we serialise the given object’s properties down into table
 cells with column types supported by the underlying database – but even in this
 seemingly obvious case it’s worth to stop for a second and think.
 
@@ -76,11 +68,12 @@ booleans are usually fair game, and the ORM can take care of exposing them as
 `true` and `false`), or should we actually limit the portability while
 leveraging a given RDBMS’s features? For example, PostgreSQL not only exposes
 ‘real’ booleans, but [a lot of other very useful
-types](http://www.postgresql.org/docs/9.1/static/datatype.html) – such as
-geometric points and paths, network addresses, XML (with XPath query support to
-search and filter by!) or arrays (so we can actually store a given blog post’s
-tags in a single column in the `posts` table and query by inclusion/exclusion
-just as well as with a separate join table).
+types](http://www.postgresql.org/docs/9.1/static/datatype.html), including
+geometric points and paths, network addresses, and XML documents that
+can be searched and filtered via XPath. It even supports arrays, which means
+that we can store a given blog post’s tags in a single column in the 
+`posts` table and query by inclusion/exclusion just as well as we could 
+with a separate join table.
 
 > Database research has produced a number of good results, but the relational
 > database is not one of them.
@@ -95,19 +88,31 @@ databases, document databases also usually allow us to store properties that
 are arrays or hashes, and allow easy storage of related objects as nested
 documents (the canonical example being comments for a blog post, in cases when
 they’re most often requested only in the context of the given post). This
-allows for all sorts of tradeoffs (potentially many fewer joins, but at the
-price of more costly joins when they’re still needed and quite a lot more
-designing up-front).
+results in all sorts of tradeoffs. For example, you may end up needing to
+do fewer joins overall, but the ones you do have to do come at a higher 
+cost in both performance and upfront design work.
 
-Other kinds of databases have still other approaches for serialising objects.
-Key-value stores (like Redis) usually need the objects to be in an
-already-serialised form (e.g., represented as JSON strings), but then there are
+Other kinds of databases have still other approaches for serialising objects:
+
+* Key-value stores (like Redis) usually need the objects to be in an
+already-serialised form (e.g., represented as JSON strings), but there are
 gems like [ROC](https://github.com/benlund/roc) which map simple objects
-directly to their canonical Redis representations; graph databases (like Neo4j)
-are centred around object relations, and often allow persisting objects as
-schema-less nodes, akin to document databases; other storage types (like
-directory services, e.g. LDAP) have their own object/persistence mapping
-specifics as well.
+directly to their canonical Redis representations. 
+
+* Graph databases (like Neo4j) are centred around object relations, 
+and often allow persisting objects as schema-less nodes, akin to 
+document databases. 
+
+* Many other storage types have their own object/persistence 
+mapping specifics as well. For example, as a directory service,
+LDAP does things in a way that is different than how general purpose 
+persistence methods tend to work. 
+
+From just this short overview, it should be fairly clear that there are no
+shortage of options when it comes to deciding how your objects should
+be persisted. In fact, even Ruby itself ships with a simple object store!
+
+### Ruby's built in persistence mechanism 
 
 One of my personal favourite ways of persisting objects is the `PStore`
 library (distributed with Ruby) coupled with YAML serialisation. While
@@ -171,19 +176,14 @@ db:
 
 This allows us to have an automated way to persist and rehydrate our `Quote`
 objects while also allowing us to easily edit them and fix any typos right
-there in the YAML file. Is it scalable? Probably not really, but [my current
+there in the YAML file. Is it scalable? Maybe not, but [my current
 database of email
 signatures](https://github.com/chastell/dotfiles/blob/aee1d31618e2e4ea88186eda163f29ebd72702d1/.local/share/signore/signatures.yml)
 consists of 4,000 entries and works fast enough.
 
-(And – if you’re eager to try YAML as a storage backend – [YAML
-Record](https://github.com/nico-taing/yaml_record) and [YAML
-Model](http://www.darkarts.co.za/yaml-model) might be worth checking out.)
+> **NOTE:** If you’re eager to try YAML as a storage backend, check out [YAML Record](https://github.com/nico-taing/yaml_record) and [YAML Model](http://www.darkarts.co.za/yaml-model).
 
-
-
-Sweet Relations, How Do They Work?
-----------------------------------
+### Sweet Relations, How Do They Work?
 
 Now that we’ve covered the idea of object persistence using various backends
 it’s time to finally talk about relations between objects. Quite often it’s the
@@ -233,19 +233,16 @@ often done on the client side, even if it’s greatly simplified by tools like
 [MongoHydrator](https://github.com/gregspurrier/mongo_hydrator).
 
 Key-value stores are, by definition, the least relation-friendly backends – and
-using them for modelling relations requires explicit foreign keys that need to
+using them for modeling relations requires explicit foreign keys that need to
 be managed client-side. On the other end of the spectrum are graph databases:
 relations (modelled as edges) can usually carry any data required, can as
 easily point in either or both directions and are represented in the same way
 regardless of whether they model a one-to-one, one-to-many or many-to-many
 relation. Graph databases also allow for all kinds of data analysis/querying
-based on the relations themselves – things like graph traversal or proximity
-metrics are much easier done (and much faster) than in relational databases.
+based on the relations themselves, making things like graph traversal or proximity
+metrics easier and faster than they would be with a relational database.
 
-
-
-Modelling Relations as Proper Objects
--------------------------------------
+### Modelling Relations as Proper Objects
 
 Now that we know the different ways (and issues with) persisting objects and
 relations between them – is there a way to model relations that could be deemed
@@ -253,7 +250,7 @@ relations between them – is there a way to model relations that could be deeme
 approaches would be to model relations as proper objects in the system, akin to
 how they’re modelled in graph databases.
 
-With this approach relations would be objects that reference two other objects
+With this approach, relations would be objects that reference two other objects
 and carry any additional data particular to a given relation (such as
 participation role in a relation between a person and an event, start/end dates
 of the given relation, etc.). This approach is the most flexible in schema-less
@@ -289,16 +286,13 @@ solely based on its UUID, relations become – in their simplest form – just
 triples of 128-bit UUIDs (one identifying the relation and the other two the
 referenced objects) plus some information about the relation type.
 
-
-
-Object Databases
-----------------
+### Object Databases
 
 > Now that people are considering NoSQL will more people consider no-database?
 >
 > <cite>Martin Fowler</cite>
 
-Quite a different approach to solving problems with persisiting relations
+Quite a different approach to solving problems with persisting relations
 between objects is not to persist the objects in any way that requires explicit
 mapping, but by using an object database instead.
 
@@ -312,23 +306,20 @@ is expressed…). Currently the most promising solution for straight object
 persistence is [MagLev](http://maglev.github.com) – a recently released Ruby
 implementation built on top of the GemStone/S Virtual Machine known as _the_
 Smalltalk object persistence solution. While it probably won’t be
-a widely-adopted silver bullet for some time, I have hight hopes for MagLev and
+a widely-adopted silver bullet for some time, I have high hopes for MagLev and
 the changes object persistence can bring to the way we think about giving our
 objects immortality.
 
-
-
-Not Your Usual Persistence Models
----------------------------------
+### Not Your Usual Persistence Models
 
 I would like to wrap up this article with two examples of object persistence
 that are not related to persisting relations, but rather to hiding persistence
 altogether. While ActiveRecord gives us a nice abstraction for wrting SQL,
-these two examples show how persitence can be still abstracted more.
+these two examples show how persistence can be abstracted even more.
 
-The first example is [Candy](https://github.com/SFEley/candy) – while, sadly,
-currenty unmaintained (and in need of a fix to get running with the current
-mongo gem), Candy is a nice/crazy example how object persistence can be hidden
+The first example is [Candy](https://github.com/SFEley/candy). While
+currently unmaintained and in need of a fix to get running with the current
+mongo gem, Candy is a nice and/or crazy example how object persistence can be hidden
 from our eyes with a single `include Candy::Piece` line:
 
 ```ruby
@@ -339,8 +330,8 @@ class Conference
 end
 
 rubyconf = Conference.new
-# connects to localhost:27017 and ‘chastell’ db if needed
-# and saves a new document to the ‘Conference’ collection
+# connects to localhost:27017 and 'chastell' db if needed
+# and saves a new document to the 'Conference' collection
 
 rubyconf.location = 'New Orleans'   # method_missing resaves
 
@@ -349,11 +340,12 @@ rubyconf.events.parties.thursday    #=> '&block Party'
 ```
 
 For a similarly unobtrusive way to _query_ a collection,
-[Ambition](http://defunkt.io/ambition/) – unfortunately, also currently
-unmaintained, although I heard its DataMapper adapter is getting some love –
-provides a way to do Ruby-like queries against any supported persistence store.
+[Ambition](http://defunkt.io/ambition/) provides a way to do Ruby-like 
+queries against any supported persistence store. Like Candy, it is
+currently unmaintained but is worth looking nonetheless.
 
-Compare an example query against an ActiveRecord-supported store:
+To see why Ambition is interesting, compare the following query against 
+an ActiveRecord-supported store:
 
 ```ruby
 require 'ambition/adapters/active_record'
@@ -392,7 +384,7 @@ WHERE (
 )
 ```
 
-…while the query generated by the latter is the equivalent LDAP selector of
+…while the query generated by the latter is the equivalent LDAP selector:
 
 ```
 (|
@@ -401,14 +393,24 @@ WHERE (
 )
 ```
 
-I brought these two examples up in this article, because the problem of
-persisting object relations is tightly related to the general problem of object
+These examples demonstrate how the benefits of the cross-platform nature of
+using an ORM are preserved even though the syntax makes it appear as if
+you are not working with a database at all. While this style of interface
+never quite caught on in the Ruby world, it is at least interesting to
+think about.
+
+### Closing Thoughts
+
+The problem of persisting object relations is tightly related to the general problem of object
 persistence. While Rails, with its `rails generate model`-driven development,
 teaches us that our domain models should be tied one-to-one to their database
-representations, there are other (potentially: better) ways to do persistence
-in object oriented world – and if this topic sounds intriguing, you might be
+representations, there are other (potentially better) ways to do persistence
+in object oriented world.
+
+If this topic sounds intriguing, you might be
 interested in another of my talks, given at wroc\_love.rb this year (with a
 highly revised version scheduled for the Scottish Ruby Conference in Edinburgh):
 _Decoupling Persistence (Like There’s Some Tomorrow)_
 ([slides](http://decoupling-wrocloverb-2012.heroku.com),
 [video](https://www.youtube.com/watch?v=w7Eol9N3jGI)).
+
