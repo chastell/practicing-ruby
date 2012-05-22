@@ -122,7 +122,7 @@ simplicity can be quite a benefit.
 
 Let’s assume for a second that we want to write [a small application for
 handling quotes](https://github.com/chastell/signore) – what would be the
-simplest way to persist them? See for yourselves:
+simplest way to persist them? See for yourself:
 
 ```ruby
 require 'yaml/store'
@@ -199,7 +199,7 @@ rows of a single table (which translates to the assumption that objects of the
 same class have the same property types), not from relations between objects of
 potentially different classes, which end up being rows in separate tables.
 
-Modelling relations in relational databases is quite complicated and depends on
+Modeling relations in relational databases is quite complicated and depends on
 the type of relation, its directionality and whether it carries any
 relation-specific data. For example, an object representing a person can have
 the relations such as having a particular gender (one-to-many relation), having
@@ -217,13 +217,13 @@ executing (potentially complicated) SQL `JOIN` queries.
 
 _An example set of relations (arrows) between ‘typical’ objects in a system._
 
-Modelling relations in document databases is quite different. Some of the
+Modeling relations in document databases is quite different. Some of the
 relations (like the above-mentioned post/comments example) are best modelled
-using embedded documents; while very useful in certain scenarios (retrieving
+using embedded documents. While very useful in certain scenarios (e.g. retrieving
 a post with all of its comments), this approach might cause problems when new
-features require cross-cutting through all of such embedded documents
-– retrieving all of the comments by a given person, or getting the list of the
-most recent comments, means scanning through the whole `posts` collection.
+features require cross-cutting through all of such embedded documents. For
+example, retrieving all of the comments by a given person or getting the list of the
+most recent comments means scanning through the whole `posts` collection.
 
 While some document databases employ implicit, foreign-key-like references
 (e.g. MongoDB’s DBRefs, which are two-key documents of the form `{ $ref:
@@ -242,7 +242,7 @@ relation. Graph databases also allow for all kinds of data analysis/querying
 based on the relations themselves, making things like graph traversal or proximity
 metrics easier and faster than they would be with a relational database.
 
-### Modelling Relations as Proper Objects
+### Modeling Relations as Proper Objects
 
 Now that we know the different ways (and issues with) persisting objects and
 relations between them – is there a way to model relations that could be deemed
@@ -310,6 +310,10 @@ a widely-adopted silver bullet for some time, I have high hopes for MagLev and
 the changes object persistence can bring to the way we think about giving our
 objects immortality.
 
+Unfortunately, because the use of object databases is not widespread at all,
+there is not much more to say about them except that they may prove to be an
+interesting option in the future.
+
 ### Not Your Usual Persistence Models
 
 I would like to wrap up this article with two examples of object persistence
@@ -342,7 +346,7 @@ rubyconf.events.parties.thursday    #=> '&block Party'
 For a similarly unobtrusive way to _query_ a collection,
 [Ambition](http://defunkt.io/ambition/) provides a way to do Ruby-like 
 queries against any supported persistence store. Like Candy, it is
-currently unmaintained but is worth looking nonetheless.
+currently unmaintained but is still worth checking out.
 
 To see why Ambition is interesting, compare the following query against 
 an ActiveRecord-supported store:
