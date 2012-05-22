@@ -213,7 +213,7 @@ key, other require a separate join table (potentially carrying any
 relation-specific data). Dereferencing such relations means crafting and
 executing (potentially complicated) SQL `JOIN` queries.
 
-![relations](https://github.com/chastell/practicing-ruby/raw/master/relations.png)
+![relations](http://i.imgur.com/CO6gf.png)
 
 _An example set of relations (arrows) between ‘typical’ objects in a system._
 
